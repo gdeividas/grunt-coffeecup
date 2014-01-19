@@ -14,10 +14,15 @@ module.exports = (grunt) ->
       separator: grunt.util.linefeed
     )
 
+    allValidFiles = []
+
     grunt.verbose.writeflags options, "Options"
 
     @files.forEach (f) ->
       validFiles = removeInvalidFiles(f)
+
+      allValidFiles.concat validFiles
+
       output = undefined
       
       # get all extensions for input files
@@ -37,6 +42,11 @@ module.exports = (grunt) ->
       else
         grunt.file.write f.dest, output
         grunt.log.writeln "File " + f.dest + " created."
+
+    
+    if grunt.event.listeners('coffeecup.compile.done').length > 0
+      grunt.event.emit 'coffeecup.compile.done', allValidFiles, options
+    
 
   removeInvalidFiles = (files) ->
     files.src.filter (filepath) ->
